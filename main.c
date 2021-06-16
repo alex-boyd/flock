@@ -13,7 +13,7 @@ int main(int argc, char** argv)
     SDL_Window * win = NULL;
     SDL_Surface * surf = NULL;
 
-    if (SDL_INIT(SDL_INIT_VIDEO) < 0 )
+    if (SDL_Init(SDL_INIT_VIDEO) < 0 )
     {
         printf("SDL failed to initialize. SDL_Error: %s\n", SDL_GetError());
         return die(win, 1);
