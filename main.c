@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include <vulkan.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -7,6 +8,14 @@
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
+
+// exit failure if result operation was not a success
+#define TRY(result) 														\
+	if (VK_SUCCESS != (result)) 											\
+	{																		\
+		printf("Fatal error in %s on line %u. :(\n", __FILE__, __LINE__); 	\
+		exit(1);															\
+	}
 
 int main(int argc, char** argv)
 {
