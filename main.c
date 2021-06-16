@@ -10,7 +10,7 @@
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
-#define APP_NAME "world"
+#define APP_NAME "flock"
 
 // exit failure if result operation was not a success
 #define TRY(result) 														\

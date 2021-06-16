@@ -9,7 +9,7 @@ SDL_LIBS = $(shell pkg-config --libs sdl2 SDL2_mixer ) -lvulkan -L/usr/local/lib
 #SDL_LIBS = $(shell sdl2-config --libs ) 
 override CFLAGS += $(SDL_CFLAGS)
 override LIBS += $(SDL_LIBS)
-EXEC = world
+EXEC = flock
 
 all: ${EXEC}
 
