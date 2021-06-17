@@ -41,7 +41,7 @@ int main(int argc, char** argv)
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) < 0 )
     {
         printf("SDL failed to initialize. SDL_Error: %s\n", SDL_GetError());
-        return die(win, 1, NULL);
+        return die(win, 1);
     }
 
     // create SDL window
@@ -56,7 +56,7 @@ int main(int argc, char** argv)
     if (win == NULL)
     {
         printf("Window could not be created. SDL_Error: %s\n", SDL_GetError());
-        return die(win, 1, NULL);
+        return die(win, 1);
     }
 
     surf = SDL_GetWindowSurface(win);
@@ -141,7 +141,7 @@ int main(int argc, char** argv)
 			}
         }
 
-        if (graphics_bit != 0) { continue; } // failed to find gfx
+        if (graphics_bit != 1) { continue; } // failed to find gfx
 
         // create logical device
         const float queue_priority = 1.0f; // one normalized float / queue
@@ -185,7 +185,7 @@ int main(int argc, char** argv)
                 vk_surf,
                 &khr_support );
 
-        if (khr_support != VK_TRUE) { die(win, 1, "No KHR support"); }
+        if (khr_support != VK_TRUE) { die(win, 1); }
 
 		// create logical queue
         vkGetDeviceQueue(
@@ -205,6 +205,7 @@ int main(int argc, char** argv)
 		// free loop's resources
         free(queue_family_properties);
 
+        SDL_Delay(2000);
 
 
     }
@@ -217,5 +218,5 @@ int main(int argc, char** argv)
 	free(physical_devices);
     //vkDestroyDevice(device);
 
-    return die(win, 0, NULL);
+    return die(win, 0);
 }
