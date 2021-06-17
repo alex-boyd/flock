@@ -3,7 +3,7 @@
 
 #include <SDL2/SDL.h>
 
-int die(SDL_Window * win, int status);
+int die(SDL_Window * win, int status, char * error);
 
 
 #endif
