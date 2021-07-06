@@ -28,9 +28,11 @@ int main(int argc, char** argv)
 
     // vk vars
 	VkInstance instance;
+    VkPhysicalDevice physical_device;
     VkDevice device;
     VkQueue queue;
     VkSurfaceKHR vk_surf;
+    VkSwapchainKHR swapchain;
 
 	uint32_t physical_device_count = 0;
     uint32_t extension_count = 0;
@@ -95,6 +97,8 @@ int main(int argc, char** argv)
 
 	// create instance of vulkan
 	TRY(vkCreateInstance(&instance_info, 0, &instance));
+
+    // get our device and make a queue ----------------------------------------
 
 	// get physical devices, first calling enumerate for count, then for handles
 	TRY(vkEnumeratePhysicalDevices(instance, &physical_device_count, NULL));
@@ -169,12 +173,22 @@ int main(int argc, char** argv)
             0										// enabled physical device features
         };
 
+        // create logical device
+        physical_device = physical_devices[physical_device_index];
         vkCreateDevice(
                 physical_devices[physical_device_index], // physical device
                 &device_info,                            // device info above
                 NULL,                                    // alloc callbk ptr
                 &device );                               // logical device 
 
+		// create logical queue
+        vkGetDeviceQueue(
+                device,
+                queue_family_index,
+                0,                  // queue_index (of queue_count, 1)
+                &queue );
+
+        // KHR surface world // swapchain creation --------------------------
 
         // create vulkan surface, check compatibility with queue family
         SDL_Vulkan_CreateSurface(win, instance, &vk_surf);
@@ -184,20 +198,38 @@ int main(int argc, char** argv)
                 queue_family_index,
                 vk_surf,
                 &khr_support );
-
         if (khr_support != VK_TRUE) { die(win, 1); }
 
-		// create logical queue
-        vkGetDeviceQueue(
-                device,
-                queue_family_index,
-                0,                  // queue_index (of queue_count, 1)
-                &queue );
+        VkSurfaceCapabilitiesKHR surface_capabilities;
+        if (vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
+                physical_device,
+                vk_surf,
+                &surface_capabilities ) != VK_SUCCESS) 
+        { 
+            printf("couldnt get surface capabilities\n");
+            die (win, 0); 
+        }
 
 
+
+        /*
+        if (vkGetPhysicalDeviceSurfaceFormatsKHR(
+                    physical_device,
+                    vk_surf,
+                    &surface_capabilities,
+                    NULL ) != VK_SUCCESS ) 
+            */
+
+
+                    
 
 		// allocate memory
+        //const VkDeviceSize memory_size;
+        //for (uint32_t k = 0; k & lt;
+
+
 		// make in/out buffers out of memory
+                
 		// command buffer
 		// shaders??
 		// compile shaders
@@ -206,13 +238,7 @@ int main(int argc, char** argv)
         free(queue_family_properties);
 
         SDL_Delay(2000);
-
-
     }
-
-
-
-
 
 	// free resources
 	free(physical_devices);
