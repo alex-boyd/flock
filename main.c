@@ -286,17 +286,30 @@ int main(int argc, char** argv)
         }
         else 
         {
+            // try to find standard 32 bit color
+            int standard_found = 0;
             for (int i = 0; i < format_count; i++)
             {
-                //if 
+                if (surface_formats[i].format == VK_FORMAT_F8G8B8A8_UNORM)
+                {
+                    surface_format = surfac_formats[i];
+                    standard_found = 1;
+                    break;
+                }
+            }
+
+            // if you cant, just take the first available format
+            if (standard_found != 0)
+            {
+                surface_format = surface_formats[0];
             }
         }
-
         
-        // select a swapchain size
+        // select a swapchain size ------------------------
+        
         
 
-        // select a surface transform
+        // select a surface transform ---------------------
 
         // select a presentation mode (prefer mailbox -> triple buffered?)
 
