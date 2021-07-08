@@ -6,6 +6,8 @@
    https://gist.github.com/Overv/7ac07356037592a121225172d7d78f2d
 */
 
+// includes ------------------------------------------------------------------
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_vulkan.h>
 #include <vulkan.h>
@@ -14,6 +16,8 @@
 
 #include "util.h"
 #include "perlin.h"
+
+// globals and macros --------------------------------------------------------
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
@@ -27,6 +31,12 @@ const int SCREEN_HEIGHT = 480;
 		printf("Fatal error in %s on line %u. :(\n", __FILE__, __LINE__); 	\
 		exit(1);															\
 	}
+
+// min and max from freebsd
+#define MIN(a,b) (((a)<(b))?(a):(b))
+#define MAX(a,b) (((a)>(b))?(a):(b))
+
+// main ----------------------------------------------------------------------
 
 int main(int argc, char** argv)
 {
@@ -306,8 +316,19 @@ int main(int argc, char** argv)
         }
         
         // select a swapchain size ------------------------
-        
-        
+        VkExtent2D swap_extent;
+
+        if (surface_capabilities.currentExtent.width == -1)
+        {
+            swap_extent = {};
+            swap_extent.width = MIN( 
+                    MAX(SCREEN_WIDTH, surface_capabilities.minImageExtent.width), 
+                    surface_capabilities.maxImageExtent.width);
+
+            swap_extent.height = MIN( 
+                    MAX(SCREEN_HEIGHT, surface_capabilities.minImageExtent.height), 
+                    surface_capabilities.maxImageExtent.height);
+        }
 
         // select a surface transform ---------------------
 
