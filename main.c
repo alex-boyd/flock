@@ -1,3 +1,11 @@
+/*
+   main.c
+   initializes SDL and Vulkan, and runs our program (once we have one ;)
+
+   Some boilerplate adapted from:
+   https://gist.github.com/Overv/7ac07356037592a121225172d7d78f2d
+*/
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_vulkan.h>
 #include <vulkan.h>
@@ -200,25 +208,102 @@ int main(int argc, char** argv)
                 &khr_support );
         if (khr_support != VK_TRUE) { die(win, 1); }
 
+        // get the surface's capabilities
         VkSurfaceCapabilitiesKHR surface_capabilities;
         if (vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
                 physical_device,
                 vk_surf,
                 &surface_capabilities ) != VK_SUCCESS) 
         { 
-            printf("couldnt get surface capabilities\n");
-            die (win, 0); 
+            printf("Error: couldnt get surface capabilities. \n");
+            die (win, 1); 
         }
 
-
-
-        /*
+        // get the surface's supported color formats
+        uint32_t format_count;
         if (vkGetPhysicalDeviceSurfaceFormatsKHR(
-                    physical_device,
-                    vk_surf,
-                    &surface_capabilities,
-                    NULL ) != VK_SUCCESS ) 
-            */
+                physical_device,
+                vk_surf,
+                &format_count,
+                NULL ) != VK_SUCCESS) 
+        { 
+            printf("Error: couldnt get surface format count. \n");
+            die (win, 1); 
+        }
+
+        VkSurfaceFormatKHR * surface_formats = 
+            malloc(sizeof(VkSurfaceFormatKHR) * format_count); // not freed
+        if (vkGetPhysicalDeviceSurfaceFormatsKHR(
+                physical_device,
+                vk_surf,
+                &format_count,
+                surface_formats ) != VK_SUCCESS) 
+        { 
+            printf("Error: couldnt get surface formats . \n");
+            die (win, 1); 
+        }
+
+        // find surface's supported presentation modes
+        uint32_t present_mode_count;
+        if (vkGetPhysicalDeviceSurfacePresentModesKHR(
+                physical_device,
+                vk_surf,
+                &present_mode_count,
+                NULL ) != VK_SUCCESS) 
+        { 
+            printf("Error: couldnt get presentation mode count. \n");
+            die (win, 1); 
+        }
+
+        VkPresentModeKHR * present_modes = 
+            malloc(sizeof(VkPresentModeKHR) * format_count); // not freed
+        if (vkGetPhysicalDeviceSurfacePresentModesKHR(
+                physical_device,
+                vk_surf,
+                &present_mode_count,
+                present_modes ) != VK_SUCCESS) 
+        { 
+            printf("Error: couldnt get presentation modes. \n");
+            die (win, 1); 
+        }
+
+        // determine number of images in the swapchain
+        uint32_t image_count = surface_capabilities.minImageCount + 1;
+        if (surfaceCapabilities.maxImageCount != 0 && 
+                image_count > surface_capabilities.maxImageCount)
+        {
+            image_count = surface_capabilities.maxImageCount;
+        }
+
+        // select a surface format -------------------------
+        VkSurfaceFormatKHR surface_format;
+
+        // if undefined, try standard 32 bit color
+        if (format_count == 1 && surface_formats[0].format == VK_FORMAT_UNDEFINED)
+        {
+            surface_format = {VK_FORMAT_R8G8B8A8_UNORM, 
+                              VK_COLORSPACE_SRGB_NONLINEAR_KHR};
+        }
+        else 
+        {
+            for (int i = 0; i < format_count; i++)
+            {
+                //if 
+            }
+        }
+
+        
+        // select a swapchain size
+        
+
+        // select a surface transform
+
+        // select a presentation mode (prefer mailbox -> triple buffered?)
+
+
+
+
+
 
 
                     
