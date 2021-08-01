@@ -279,7 +279,7 @@ int main(int argc, char** argv)
 
         // determine number of images in the swapchain
         uint32_t image_count = surface_capabilities.minImageCount + 1;
-        if (surfaceCapabilities.maxImageCount != 0 && 
+        if (surface_capabilities.maxImageCount != 0 && 
                 image_count > surface_capabilities.maxImageCount)
         {
             image_count = surface_capabilities.maxImageCount;
@@ -291,8 +291,8 @@ int main(int argc, char** argv)
         // if undefined, try standard 32 bit color
         if (format_count == 1 && surface_formats[0].format == VK_FORMAT_UNDEFINED)
         {
-            surface_format = {VK_FORMAT_R8G8B8A8_UNORM, 
-                              VK_COLORSPACE_SRGB_NONLINEAR_KHR};
+            surface_format.format = VK_FORMAT_R8G8B8A8_UNORM; 
+            surface_format.colorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
         }
         else 
         {
@@ -300,9 +300,9 @@ int main(int argc, char** argv)
             int standard_found = 0;
             for (int i = 0; i < format_count; i++)
             {
-                if (surface_formats[i].format == VK_FORMAT_F8G8B8A8_UNORM)
+                if (surface_formats[i].format == VK_FORMAT_R8G8B8A8_UNORM)
                 {
-                    surface_format = surfac_formats[i];
+                    surface_format = surface_formats[i];
                     standard_found = 1;
                     break;
                 }
@@ -320,7 +320,6 @@ int main(int argc, char** argv)
 
         if (surface_capabilities.currentExtent.width == -1)
         {
-            swap_extent = {};
             swap_extent.width = MIN( 
                     MAX(SCREEN_WIDTH, surface_capabilities.minImageExtent.width), 
                     surface_capabilities.maxImageExtent.width);
@@ -330,7 +329,16 @@ int main(int argc, char** argv)
                     surface_capabilities.maxImageExtent.height);
         }
 
-        // select a surface transform ---------------------
+        // select a surface transform (hopefully none)  ----
+        VkSurfaceTransformFlagBitsKHR surface_transform;
+        if (surface_capabilities.supportedTransforms & 
+                VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR)
+        {
+            surface_transform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
+        } else
+        {
+            surface_transform = surface_capabilities.currentTransform;
+        }
 
         // select a presentation mode (prefer mailbox -> triple buffered?)
 
