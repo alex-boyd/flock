@@ -341,6 +341,27 @@ int main(int argc, char** argv)
         }
 
         // select a presentation mode (prefer mailbox -> triple buffered?)
+        VkPresentModeKHR present_mode;
+        int mailbox = 0;
+        for(int i = 0; i < present_mode_count; i++)
+        {
+            if (present_modes[i] == VK_PRESENT_MODE_MAILBOX_KHR)
+            {
+                present_mode = present_modes[i];
+                mailbox = 1;
+            }
+        }
+        if (mailbox == 0)
+        {
+            present_mode = VK_PRESENT_MODE_FIFO_KHR;
+        }
+
+        // actually create swapchain with given specifications ---------
+
+        //VkSwahp
+
+
+
 
 
 
