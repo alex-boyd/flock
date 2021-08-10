@@ -6,6 +6,39 @@
    https://gist.github.com/Overv/7ac07356037592a121225172d7d78f2d
 */
 
+/*
+   void setupVulkan() {
+		x createInstance();
+		?  createDebugCallback();
+		x createWindowSurface();
+		x findPhysicalDevice();
+		x checkSwapChainSupport();
+		x findQueueFamilies();
+		x createLogicalDevice();
+		createSemaphores();
+		createCommandPool();
+		createVertexBuffer();
+		createUniformBuffer();
+		x createSwapChain();
+		createRenderPass();
+		createImageViews();
+		createFramebuffers();
+		createGraphicsPipeline();
+		createDescriptorPool();
+		createDescriptorSet();
+		createCommandBuffers();
+	}
+
+	void mainLoop() {
+			updateUniformData();
+			draw();
+
+		}
+	}
+
+*/
+
+
 // includes ------------------------------------------------------------------
 
 #include <SDL2/SDL.h>
@@ -49,8 +82,12 @@ int main(int argc, char** argv)
     VkPhysicalDevice physical_device;
     VkDevice device;
     VkQueue queue;
+    VkSemaphore image_available;
+    VkSemaphore rendering_finished;
     VkSurfaceKHR vk_surf;
     VkSwapchainKHR swapchain;
+    VkImage * swapchain_images = NULL;
+
 
 	uint32_t physical_device_count = 0;
     uint32_t extension_count = 0;
@@ -206,6 +243,26 @@ int main(int argc, char** argv)
                 0,                  // queue_index (of queue_count, 1)
                 &queue );
 
+        // create semaphores ------------------------------------------------
+        VkSemaphoreCreateInfo semaphore_info;
+        semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+        if ( vkCreateSemaphore(
+                    device, 
+                    &semaphore_info, 
+                    NULL, 
+                    &image_available ) != VK_SUCCESS || 
+             vkCreateSemaphore(
+                    device, 
+                    &semaphore_info, 
+                    NULL, 
+                    &rendering_finished ) != VK_SUCCESS )
+        {
+            printf("failed to create semaphores\n");
+            die(win, 0);
+        }
+                
+
+
         // KHR surface world // swapchain creation --------------------------
 
         // create vulkan surface, check compatibility with queue family
@@ -358,13 +415,60 @@ int main(int argc, char** argv)
 
         // actually create swapchain with given specifications ---------
 
-        //VkSwahp
+        VkSwapchainCreateInfoKHR swapchain_info;
+        swapchain_info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+        swapchain_info.surface = vk_surf;
+        swapchain_info.minImageCount = image_count;
+        swapchain_info.imageFormat = surface_format.format;
+        swapchain_info.imageColorSpace = surface_format.colorSpace;
+		swapchain_info.imageExtent = swap_extent;
+		swapchain_info.imageArrayLayers = 1;
+		swapchain_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+		swapchain_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		swapchain_info.queueFamilyIndexCount = 0;
+		swapchain_info.pQueueFamilyIndices = NULL;
+		swapchain_info.preTransform = surface_transform;
+		swapchain_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+		swapchain_info.presentMode = present_mode;
+		swapchain_info.clipped = VK_TRUE;
+		swapchain_info.oldSwapchain = VK_NULL_HANDLE; // ?
 
+        if ( vkCreateSwapchainKHR(
+                    device, 
+                    &swapchain_info,
+                    NULL,
+                    &swapchain ) != VK_SUCCESS )
+        {
+            die(win, 0);
+        }
 
+        // get swapchain image count, then set the image count  --------------
+        uint32_t actual_image_count = 0;
+        // get number
+        if( vkGetSwapchainImagesKHR(
+                    device, 
+                    swapchain,
+                    &actual_image_count,
+                    swapchain_images) != VK_SUCCESS ||
+            actual_image_count == 0)
+        {
+            die(win, 0);
+        }
 
+        // proceed with creating actual_image_count swapchain images
+        swapchain_images = malloc( actual_image_count * sizeof(VkImage) );
+        if( vkGetSwapchainImagesKHR(
+                    device, 
+                    swapchain,
+                    &actual_image_count,
+                    swapchain_images) != VK_SUCCESS )
+        {
+            die(win, 0);
+        }
 
+        // swapchain complete!
 
-
+        // 
 
 
 
@@ -385,7 +489,7 @@ int main(int argc, char** argv)
 		// free loop's resources
         free(queue_family_properties);
 
-        SDL_Delay(2000);
+        SDL_Delay(3000);
     }
 
 	// free resources
@@ -394,3 +498,6 @@ int main(int argc, char** argv)
 
     return die(win, 0);
 }
+
+
+
