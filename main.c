@@ -1,8 +1,8 @@
 /*
    main.c
-   initializes SDL and Vulkan, and runs our program (once we have one ;)
+   initializes SDL and Vulkan, and runs our program 
 
-   Some boilerplate adapted from:
+   boilerplate adapted from:
    https://gist.github.com/Overv/7ac07356037592a121225172d7d78f2d
 */
 
@@ -15,8 +15,8 @@
 		x checkSwapChainSupport();
 		x findQueueFamilies();
 		x createLogicalDevice();
-		createSemaphores();
-		createCommandPool();
+		x createSemaphores();
+		x createCommandPool();
 		createVertexBuffer();
 		createUniformBuffer();
 		x createSwapChain();
@@ -26,8 +26,7 @@
 		createGraphicsPipeline();
 		createDescriptorPool();
 		createDescriptorSet();
-		createCommandBuffers();
-	}
+		createCommandBuffers(); }
 
 	void mainLoop() {
 			updateUniformData();
@@ -84,6 +83,7 @@ int main(int argc, char** argv)
     VkQueue queue;
     VkSemaphore image_available;
     VkSemaphore rendering_finished;
+    VkCommandPool command_pool;
     VkSurfaceKHR vk_surf;
     VkSwapchainKHR swapchain;
     VkImage * swapchain_images = NULL;
@@ -260,10 +260,23 @@ int main(int argc, char** argv)
             printf("failed to create semaphores\n");
             die(win, 0);
         }
-                
 
+        // create command pool -----------------------------------------------
+        VkCommandPoolCreateInfo command_pool_info;
+        command_pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+        command_pool_info.queueFamilyIndex = queue_family_index;
+        
+        if ( vkCreateCommandPool( 
+                    device,
+                    &command_pool_info,
+                    NULL,
+                    &command_pool ) != VK_SUCCESS )
+        {
+            printf("Failed to create command pool.\n");
+            die(win, 0);
+        } 
 
-        // KHR surface world // swapchain creation --------------------------
+        // KHR surface world // swapchain creation ---------------------------
 
         // create vulkan surface, check compatibility with queue family
         SDL_Vulkan_CreateSurface(win, instance, &vk_surf);
@@ -468,7 +481,13 @@ int main(int argc, char** argv)
 
         // swapchain complete!
 
-        // 
+        // create vertex buffer ----------------------------------------------
+        
+        // placeholder triangle vertices
+
+
+        // create uniform buffer ---------------------------------------------
+
 
 
 
